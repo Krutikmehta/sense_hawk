@@ -25,6 +25,7 @@ const distance = (lat1, lat2, lon1, lon2) => {
   // The math module contains a function
   // named toRadians which converts from
   // degrees to radians.
+  console.log(lat1, lat2, lon1, lon2);
   lon1 = (lon1 * Math.PI) / 180;
   lon2 = (lon2 * Math.PI) / 180;
   lat1 = (lat1 * Math.PI) / 180;
@@ -49,7 +50,8 @@ const distance = (lat1, lat2, lon1, lon2) => {
 // create a component
 const Map = ({navigation}) => {
   const [userId, setUserId] = useState(null);
-  const [userLocation, setUserLocation] = useState([70, 20]);
+  const [userName, setUserName] = useState(null);
+  const [userLocation, setUserLocation] = useState([]);
   const [markersData, setMarkersData] = useState([]);
   const mapRef = useRef();
 
@@ -57,6 +59,7 @@ const Map = ({navigation}) => {
     try {
       const userId = await AsyncStorage.getItem('userId');
       setUserId(userId);
+      setUserName(userName);
       const userRef = doc(firestore, 'users', userId);
       await updateDoc(userRef, {
         location: [longitude, latitude],
@@ -69,29 +72,46 @@ const Map = ({navigation}) => {
     const q = query(collection(firestore, 'users'));
     const locations = [];
     const unsubscribe = onSnapshot(q, querySnapshot => {
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
-        const dist = distance(
-          data.location[1],
-          userLocation[1],
-          data.location[0],
-          userLocation[0],
-        );
-        if (dist >= 0) {
-          locations.push({...data});
-        }
-      });
-      setMarkersData(locations);
+      try {
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.userId === userId) {
+            setUserName(data.userName);
+          }
+          if (
+            data &&
+            data.location.length === 2 &&
+            userLocation &&
+            userLocation.length === 2
+          ) {
+            const dist = distance(
+              data.location[1],
+              userLocation[1],
+              data.location[0],
+              userLocation[0],
+            );
+            console.log(dist);
+            if (dist <= 1) {
+              locations.push({...data});
+            }
+          }
+        });
+        setMarkersData(locations);
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     return unsubscribe;
   };
 
   useEffect(() => {
-    const unsubscribe = getAllDocs();
-    // return () => unsubscribe();
+    if (userLocation && userLocation.length === 2) {
+      updateUserLocation(userLocation[0], userLocation[1]).then(() => {
+        const unsubscribe = getAllDocs();
+      });
+    }
   }, [userLocation]);
-
   useEffect(() => {
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
@@ -99,8 +119,11 @@ const Map = ({navigation}) => {
     })
       .then(location => {
         setUserLocation([location.longitude, location.latitude]);
-        updateUserLocation(location.longitude, location.latitude);
-        mapRef.current.flyTo([location.longitude, location.latitude], 1200);
+
+        mapRef.current.moveTo([location.longitude, location.latitude], 1200);
+        setTimeout(() => {
+          mapRef.current.zoomTo(13);
+        }, 1200);
       })
       .catch(error => {
         const {code, message} = error;
@@ -118,16 +141,19 @@ const Map = ({navigation}) => {
   }, []);
 
   const RenderMarkers = ({data}) => {
+    if (!data.location) return null;
     const onPress = () => {
       if (data.userId !== userId)
         navigation.navigate('Chat', {
           userId2: data.userId,
           userId1: userId,
-          userName: data.userName,
+          userName1: userName,
+          userName2: data.userName,
         });
     };
+
     return (
-      <MarkerView coordinate={data.location}>
+      <MarkerView coordinate={[data.location[0], data.location[1]]}>
         <TouchableOpacity onPress={onPress}>
           {data.userId === userId ? (
             <Text style={styles.markerTextSelf}>{'ME'}</Text>
@@ -141,11 +167,11 @@ const Map = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.mapWrapper}>
-        <MapboxGL.MapView style={styles.map} showUserLocation={true}>
-          {[userLocation, ...markersData].map((data, index) => (
+        <MapboxGL.MapView style={styles.map}>
+          {[...markersData].map((data, index) => (
             <RenderMarkers data={data} key={index} />
           ))}
-          <MapboxGL.Camera ref={mapRef} zoomLevel={10} />
+          <MapboxGL.Camera ref={mapRef} />
         </MapboxGL.MapView>
       </View>
     </View>

@@ -10,9 +10,11 @@ import Header from '../components/Header';
 // create a component
 const Messages = ({navigation}) => {
   const [conversations, setConversations] = useState([]);
+  const [userId, setUserId] = useState('');
   useEffect(() => {
     const getConversations = async () => {
       const userId = await AsyncStorage.getItem('userId');
+      setUserId(userId);
       const q = query(
         collection(firestore, 'conversations'),
         or(
@@ -45,7 +47,10 @@ const Messages = ({navigation}) => {
 
   const RenderCard = ({item, index}) => {
     const onPress = () => {
-      navigation.navigate('Chat', {conversationId: item.conversationId});
+      navigation.navigate('Chat', {
+        conversationId: item.conversationId,
+        userId1: userId,
+      });
     };
     return (
       <TouchableOpacity style={styles.cardContainer} onPress={onPress}>

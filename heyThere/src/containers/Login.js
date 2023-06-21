@@ -16,7 +16,6 @@ export default function Login() {
 
   const onSubmit = async () => {
     console.log(userName);
-
     try {
       const userId = uuid.v4();
       console.log(userId);

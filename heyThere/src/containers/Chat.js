@@ -10,7 +10,7 @@ import {
   set,
   query,
 } from 'firebase/database';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {GiftedChat, InputToolbar} from 'react-native-gifted-chat';
 import uuid from 'react-native-uuid';
 
 import {
@@ -29,15 +29,21 @@ import {LeftAction, ChatInput, SendButton} from 'react-native-gifted-chat';
 import Header from '../components/Header.js';
 
 export default function Chat({navigation, route}) {
-  const {conversationId: convId, userId1, userId2, userName} = route.params;
+  const {
+    conversationId: convId,
+    userId1,
+    userId2,
+    userName1,
+    userName2,
+  } = route.params;
 
   const [conversationId, setConversationId] = useState(null);
   useEffect(() => {
     const getConversationId = async () => {
       const q1 = query(
         collection(firestore, 'conversations'),
-        where('userId1', 'in', [userId1, userId2]),
-        where('userId2', 'in', [userId1, userId2]),
+        where('user1.userId', 'in', [userId1, userId2]),
+        where('user2.userId', 'in', [userId1, userId2]),
       );
       const querySnapshot = await getDocs(q1);
       let conversationId = null;
@@ -48,8 +54,8 @@ export default function Chat({navigation, route}) {
         conversationId = uuid.v4();
         setConversationId(conversationId);
         await setDoc(doc(firestore, 'conversations', conversationId), {
-          userId1,
-          userId2,
+          user1: {userId: userId1, userName: userName1},
+          user2: {userId: userId2, userName: userName2},
         });
       } else {
         setConversationId(conversationId);
@@ -95,6 +101,7 @@ export default function Chat({navigation, route}) {
   const [messages, setMessages] = useState([]);
 
   const onSend = async (messages = []) => {
+    console.log(conversationId);
     await setDoc(
       doc(firestore, 'chats', conversationId, conversationId, messages[0]._id),
       {
@@ -107,12 +114,25 @@ export default function Chat({navigation, route}) {
 
   return (
     <View style={{flex: 1}}>
-      <Header text={userName} navigation={navigation} isBack={true} />
+      <Header text={userName2} navigation={navigation} isBack={true} />
       <GiftedChat
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
           _id: userId1,
+        }}
+        renderInputToolbar={props => {
+          //Add the extra styles via containerStyle
+          return (
+            <InputToolbar
+              {...props}
+              containerStyle={{
+                borderTopWidth: 1,
+                borderTopColor: 'rgba(0,0,0,0.5)',
+              }}
+              textInputStyle={{color: 'black'}}
+            />
+          );
         }}
       />
     </View>
