@@ -12,15 +12,10 @@ import {getFirestore} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCnyUZkTq-_OcDNVHVSShBG84fgCDc6-Ws',
-
   authDomain: 'sensehawk-84593.firebaseapp.com',
-
   projectId: 'sensehawk-84593',
-
   storageBucket: 'sensehawk-84593.appspot.com',
-
   messagingSenderId: '536084258186',
-
   appId: '1:536084258186:web:ddccbe1a8328fae604fc73',
   databaseURL: 'https://sensehawk-84593-default-rtdb.firebaseio.com/',
   measurementId: 'G-0W1Y3P1R80',

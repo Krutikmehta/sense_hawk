@@ -1,7 +1,6 @@
 import {View, Text, TouchableOpacity} from 'react-native';
-import React, {useEffect} from 'react';
+import React from 'react';
 import styles from './styles/HomeStyles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({navigation}) {
   return (

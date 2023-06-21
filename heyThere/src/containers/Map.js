@@ -1,21 +1,13 @@
 //import liraries
 import React, {useEffect, useState, useRef} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
-import MapboxGL, {MarkerView, PointAnnotation} from '@rnmapbox/maps';
+import {View, Text, TouchableOpacity, Alert} from 'react-native';
+import MapboxGL, {MarkerView} from '@rnmapbox/maps';
 import GetLocation from 'react-native-get-location';
-import {db, firestore} from '../firebase.js';
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  doc,
-  onSnapshot,
-  getDocs,
-  where,
-  Timestamp,
-} from 'firebase/firestore';
+import {firestore} from '../firebase.js';
+import {collection, updateDoc, doc, onSnapshot} from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {query} from 'firebase/database';
+import styles from './styles/MapStyles.js';
 
 MapboxGL.setAccessToken(
   'pk.eyJ1Ijoia3J1dGlrbWVodGEiLCJhIjoiY2xqNWdrZWloMDB6YzNqbXBzZWcwMzBzaCJ9.b2DQjc4Sn-g21eSaNesmlg',
@@ -180,29 +172,6 @@ const Map = ({navigation}) => {
     </View>
   );
 };
-
-// define your styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#2c3e50',
-  },
-  mapWrapper: {
-    height: '100%',
-    width: '100%',
-  },
-  map: {
-    flex: 1,
-  },
-  markerTextSelf: {color: 'blue', fontSize: 20},
-  markerText: {
-    color: 'red',
-    fontSize: 20,
-    fontWeight: 400,
-  },
-});
 
 //make this component available to the app
 export default Map;

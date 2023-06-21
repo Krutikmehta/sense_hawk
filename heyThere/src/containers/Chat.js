@@ -1,32 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
-import {db, firestore} from '../firebase.js';
-import {
-  ref,
-  onValue,
-  push,
-  update,
-  remove,
-  set,
-  query,
-} from 'firebase/database';
+import {View} from 'react-native';
+import {firestore} from '../firebase.js';
+import {query} from 'firebase/database';
 import {GiftedChat, InputToolbar} from 'react-native-gifted-chat';
 import uuid from 'react-native-uuid';
 
 import {
   collection,
-  addDoc,
   setDoc,
   doc,
   where,
   getDocs,
-  getDoc,
   orderBy,
   onSnapshot,
   Timestamp,
 } from 'firebase/firestore';
-import {LeftAction, ChatInput, SendButton} from 'react-native-gifted-chat';
 import Header from '../components/Header.js';
+import styles from './styles/ChatStyles.js';
 
 export default function Chat({navigation, route}) {
   const {
@@ -114,7 +104,7 @@ export default function Chat({navigation, route}) {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.container}>
       <Header text={userName2} navigation={navigation} isBack={true} />
       <GiftedChat
         messages={messages}
@@ -127,11 +117,8 @@ export default function Chat({navigation, route}) {
           return (
             <InputToolbar
               {...props}
-              containerStyle={{
-                borderTopWidth: 1,
-                borderTopColor: 'rgba(0,0,0,0.5)',
-              }}
-              textInputStyle={{color: 'black'}}
+              containerStyle={styles.inputbar}
+              textInputStyle={styles.textInput}
             />
           );
         }}

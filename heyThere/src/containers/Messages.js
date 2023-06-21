@@ -3,9 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {query} from 'firebase/database';
 import {collection, onSnapshot, or, where} from 'firebase/firestore';
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, FlatList} from 'react-native';
 import {firestore} from '../firebase';
 import Header from '../components/Header';
+import styles from './styles/MessagesStyles';
 
 // create a component
 const Messages = ({navigation}) => {
@@ -75,26 +76,6 @@ const Messages = ({navigation}) => {
     </View>
   );
 };
-
-// define your styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-  flatlist: {
-    flex: 1,
-  },
-  cardContainer: {
-    padding: '3%',
-    marginBottom: '2%',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
-  userName: {
-    fontSize: 20,
-  },
-});
 
 //make this component available to the app
 export default Messages;

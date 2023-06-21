@@ -1,7 +1,7 @@
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import React, {useState, useContext} from 'react';
-import {db, firestore} from '../firebase.js';
-import {collection, addDoc, setDoc, doc} from 'firebase/firestore';
+import {firestore} from '../firebase.js';
+import {setDoc, doc} from 'firebase/firestore';
 import uuid from 'react-native-uuid';
 import styles from './styles/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
