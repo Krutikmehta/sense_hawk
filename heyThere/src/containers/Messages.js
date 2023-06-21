@@ -12,6 +12,7 @@ const Messages = ({navigation}) => {
   const [conversations, setConversations] = useState([]);
   const [userId, setUserId] = useState('');
   useEffect(() => {
+    let unsubscribe = () => {};
     const getConversations = async () => {
       const userId = await AsyncStorage.getItem('userId');
       setUserId(userId);
@@ -22,7 +23,7 @@ const Messages = ({navigation}) => {
           where('user2.userId', '==', userId),
         ),
       );
-      const unsubscribe = onSnapshot(q, querySnapshot => {
+      unsubscribe = onSnapshot(q, querySnapshot => {
         const tempConversations = [];
         querySnapshot.forEach(doc => {
           const data = doc.data();
@@ -40,9 +41,14 @@ const Messages = ({navigation}) => {
         });
         setConversations(tempConversations);
         console.log(tempConversations);
+        return unsubscribe;
       });
     };
     getConversations();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const RenderCard = ({item, index}) => {

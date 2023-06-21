@@ -68,7 +68,7 @@ const Map = ({navigation}) => {
       console.error('Error adding document: ', e);
     }
   };
-  const getAllDocs = async () => {
+  const getAllDocs = () => {
     const q = query(collection(firestore, 'users'));
     const locations = [];
     const unsubscribe = onSnapshot(q, querySnapshot => {
@@ -90,7 +90,6 @@ const Map = ({navigation}) => {
               data.location[0],
               userLocation[0],
             );
-            console.log(dist);
             if (dist <= 1) {
               locations.push({...data});
             }
@@ -106,11 +105,15 @@ const Map = ({navigation}) => {
   };
 
   useEffect(() => {
+    let unsubscribe = () => {};
     if (userLocation && userLocation.length === 2) {
       updateUserLocation(userLocation[0], userLocation[1]).then(() => {
-        const unsubscribe = getAllDocs();
+        unsubscribe = getAllDocs();
       });
     }
+    return () => {
+      unsubscribe();
+    };
   }, [userLocation]);
   useEffect(() => {
     GetLocation.getCurrentPosition({

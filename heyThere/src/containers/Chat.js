@@ -93,8 +93,9 @@ export default function Chat({navigation, route}) {
         });
         setMessages(newMessages);
       });
-
-      // return unsubscribe;
+      return () => {
+        unsubscribe();
+      };
     }
   }, [conversationId]);
 
