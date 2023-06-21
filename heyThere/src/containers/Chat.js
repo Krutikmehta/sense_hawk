@@ -1,70 +1,118 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text} from 'react-native';
 import {db, firestore} from '../firebase.js';
-import {ref, onValue, push, update, remove, set} from 'firebase/database';
+import {
+  ref,
+  onValue,
+  push,
+  update,
+  remove,
+  set,
+  query,
+} from 'firebase/database';
 import {GiftedChat} from 'react-native-gifted-chat';
-import {collection, addDoc} from 'firebase/firestore';
+import uuid from 'react-native-uuid';
 
-export default function Chat() {
-  const func = async () => {
-    push(ref(db, '/users'), {
-      1245: {
-        done: false,
-        title: 'presentTodo1',
-      },
-    });
+import {
+  collection,
+  addDoc,
+  setDoc,
+  doc,
+  where,
+  getDocs,
+  getDoc,
+  orderBy,
+  onSnapshot,
+  Timestamp,
+} from 'firebase/firestore';
+import {LeftAction, ChatInput, SendButton} from 'react-native-gifted-chat';
+import Header from '../components/Header.js';
 
-    try {
-      const docRef = await addDoc(collection(firestore, 'users'), {
-        first: 'Ada',
-        last: 'Lovelace',
-        born: 1815,
-      });
-      console.log('Document written with ID: ', docRef.id);
-    } catch (e) {
-      console.error('Error adding document: ', e);
-    }
-    console.log(firestore);
-    console.log(db.type);
-  };
+export default function Chat({navigation, route}) {
+  const {conversationId: convId, userId1, userId2, userName} = route.params;
+
+  const [conversationId, setConversationId] = useState(null);
   useEffect(() => {
-    func();
-    return onValue(ref(db, '/users'), querySnapShot => {
-      let data = querySnapShot.val() || {};
-      let todoItems = {...data};
-      console.log(todoItems);
-    });
-  }, []);
+    const getConversationId = async () => {
+      const q1 = query(
+        collection(firestore, 'conversations'),
+        where('userId1', 'in', [userId1, userId2]),
+        where('userId2', 'in', [userId1, userId2]),
+      );
+      const querySnapshot = await getDocs(q1);
+      let conversationId = null;
+      querySnapshot.forEach(doc => {
+        conversationId = doc.id;
+      });
+      if (conversationId === null) {
+        conversationId = uuid.v4();
+        setConversationId(conversationId);
+        await setDoc(doc(firestore, 'conversations', conversationId), {
+          userId1,
+          userId2,
+        });
+      } else {
+        setConversationId(conversationId);
+      }
+    };
+    if (!convId) getConversationId();
+    else setConversationId(convId);
+  }, [convId, userId1, userId2]);
+
+  useEffect(() => {
+    if (conversationId) {
+      const q = query(
+        collection(firestore, 'chats', conversationId, conversationId),
+        orderBy('t_create', 'desc'),
+      );
+      const unsubscribe = onSnapshot(q, querySnapshot => {
+        const newMessages = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+
+          const message = {
+            _id: doc.id,
+            text: data.text,
+            createdAt: new Timestamp(
+              data.t_create.seconds,
+              data.t_create.nanoseconds,
+            ).toDate(),
+            user: {
+              _id: data.sender,
+              name: 'React Native',
+              avatar: 'https://placeimg.com/140/140/any',
+            },
+          };
+          newMessages.push(message);
+        });
+        setMessages(newMessages);
+      });
+
+      // return unsubscribe;
+    }
+  }, [conversationId]);
+
   const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    setMessages([
+  const onSend = async (messages = []) => {
+    await setDoc(
+      doc(firestore, 'chats', conversationId, conversationId, messages[0]._id),
       {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
+        sender: userId1,
+        text: messages[0].text,
+        t_create: messages[0].createdAt,
       },
-    ]);
-  }, []);
-
-  const onSend = (messages = []) => {
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, messages),
     );
   };
 
   return (
     <View style={{flex: 1}}>
+      <Header text={userName} navigation={navigation} isBack={true} />
       <GiftedChat
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userId1,
         }}
       />
     </View>

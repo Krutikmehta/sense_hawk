@@ -1,6 +1,12 @@
 import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
   container: {
     flex: 1,
     backgroundColor: 'black',

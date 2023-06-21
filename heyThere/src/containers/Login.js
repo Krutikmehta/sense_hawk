@@ -1,7 +1,7 @@
 import {View, Text, TextInput, TouchableOpacity} from 'react-native';
 import React, {useState, useContext} from 'react';
 import {db, firestore} from '../firebase.js';
-import {collection, addDoc} from 'firebase/firestore';
+import {collection, addDoc, setDoc, doc} from 'firebase/firestore';
 import uuid from 'react-native-uuid';
 import styles from './styles/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,14 +20,12 @@ export default function Login() {
     try {
       const userId = uuid.v4();
       console.log(userId);
-      const docRef = await addDoc(collection(firestore, 'users'), {
+      await setDoc(doc(firestore, 'users', userId), {
         userName,
-        userId: uuid.v4(),
+        userId: userId,
       });
       AsyncStorage.setItem('userId', userId);
       setIsLoggedIn(true);
-
-      console.log('Document written with ID: ', docRef.id);
     } catch (e) {
       console.error('Error adding document: ', e);
     }
