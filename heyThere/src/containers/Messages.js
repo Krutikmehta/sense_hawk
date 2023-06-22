@@ -12,11 +12,15 @@ import styles from './styles/MessagesStyles';
 const Messages = ({navigation}) => {
   const [conversations, setConversations] = useState([]);
   const [userId, setUserId] = useState('');
+
   useEffect(() => {
     let unsubscribe = () => {};
+
+    // get all the conversations
     const getConversations = async () => {
       const userId = await AsyncStorage.getItem('userId');
       setUserId(userId);
+
       const q = query(
         collection(firestore, 'conversations'),
         or(
@@ -24,6 +28,8 @@ const Messages = ({navigation}) => {
           where('user2.userId', '==', userId),
         ),
       );
+
+      // add listener for updates
       unsubscribe = onSnapshot(q, querySnapshot => {
         const tempConversations = [];
         querySnapshot.forEach(doc => {
@@ -41,17 +47,18 @@ const Messages = ({navigation}) => {
           }
         });
         setConversations(tempConversations);
-        console.log(tempConversations);
         return unsubscribe;
       });
     };
     getConversations();
 
+    // remove listener
     return () => {
       unsubscribe();
     };
   }, []);
 
+  // message card
   const RenderCard = ({item, index}) => {
     const onPress = () => {
       navigation.navigate('Chat', {

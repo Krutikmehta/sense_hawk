@@ -28,7 +28,10 @@ export default function Chat({navigation, route}) {
   } = route.params;
 
   const [conversationId, setConversationId] = useState(null);
+
   useEffect(() => {
+    // check if conversation id exists,
+    // if not create one
     const getConversationId = async () => {
       const q1 = query(
         collection(firestore, 'conversations'),
@@ -56,11 +59,14 @@ export default function Chat({navigation, route}) {
   }, [convId, userId1, userId2]);
 
   useEffect(() => {
+    // get chats from conversation id
     if (conversationId) {
       const q = query(
         collection(firestore, 'chats', conversationId, conversationId),
         orderBy('t_create', 'desc'),
       );
+
+      // add listener to get updates
       const unsubscribe = onSnapshot(q, querySnapshot => {
         const newMessages = [];
         querySnapshot.forEach(doc => {
@@ -76,13 +82,15 @@ export default function Chat({navigation, route}) {
             user: {
               _id: data.sender,
               name: 'React Native',
-              avatar: 'https://placeimg.com/140/140/any',
+              // avatar: 'https://placeimg.com/140/140/any',
             },
           };
           newMessages.push(message);
         });
         setMessages(newMessages);
       });
+
+      // remove listener
       return () => {
         unsubscribe();
       };
@@ -91,8 +99,8 @@ export default function Chat({navigation, route}) {
 
   const [messages, setMessages] = useState([]);
 
+  // send message
   const onSend = async (messages = []) => {
-    console.log(conversationId);
     await setDoc(
       doc(firestore, 'chats', conversationId, conversationId, messages[0]._id),
       {
@@ -113,7 +121,6 @@ export default function Chat({navigation, route}) {
           _id: userId1,
         }}
         renderInputToolbar={props => {
-          //Add the extra styles via containerStyle
           return (
             <InputToolbar
               {...props}

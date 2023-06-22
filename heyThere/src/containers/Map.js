@@ -8,37 +8,16 @@ import {collection, updateDoc, doc, onSnapshot} from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {query} from 'firebase/database';
 import styles from './styles/MapStyles.js';
+import {distance} from '../utils/utils.js';
+import {
+  LOCATION_ACCESS_DENIED,
+  LOCATION_DISABLED,
+  UNAUTHORIZED,
+  UNAVAILABLE,
+} from '../utils/constants.js';
+import Config from 'react-native-config';
+MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
 
-MapboxGL.setAccessToken(
-  'pk.eyJ1Ijoia3J1dGlrbWVodGEiLCJhIjoiY2xqNWdrZWloMDB6YzNqbXBzZWcwMzBzaCJ9.b2DQjc4Sn-g21eSaNesmlg',
-);
-
-const distance = (lat1, lat2, lon1, lon2) => {
-  // The math module contains a function
-  // named toRadians which converts from
-  // degrees to radians.
-  console.log(lat1, lat2, lon1, lon2);
-  lon1 = (lon1 * Math.PI) / 180;
-  lon2 = (lon2 * Math.PI) / 180;
-  lat1 = (lat1 * Math.PI) / 180;
-  lat2 = (lat2 * Math.PI) / 180;
-
-  // Haversine formula
-  let dlon = lon2 - lon1;
-  let dlat = lat2 - lat1;
-  let a =
-    Math.pow(Math.sin(dlat / 2), 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
-
-  let c = 2 * Math.asin(Math.sqrt(a));
-
-  // Radius of earth in kilometers. Use 3956
-  // for miles
-  let r = 6371;
-
-  // calculate the result
-  return c * r;
-};
 // create a component
 const Map = ({navigation}) => {
   const [userId, setUserId] = useState(null);
@@ -47,11 +26,9 @@ const Map = ({navigation}) => {
   const [markersData, setMarkersData] = useState([]);
   const mapRef = useRef();
 
+  // update the users location in database
   const updateUserLocation = async (longitude, latitude) => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      setUserId(userId);
-      setUserName(userName);
       const userRef = doc(firestore, 'users', userId);
       await updateDoc(userRef, {
         location: [longitude, latitude],
@@ -60,6 +37,8 @@ const Map = ({navigation}) => {
       console.error('Error adding document: ', e);
     }
   };
+
+  // get all users locations
   const getAllDocs = () => {
     const q = query(collection(firestore, 'users'));
     const locations = [];
@@ -98,7 +77,7 @@ const Map = ({navigation}) => {
 
   useEffect(() => {
     let unsubscribe = () => {};
-    if (userLocation && userLocation.length === 2) {
+    if (userLocation && userLocation.length === 2 && userId) {
       updateUserLocation(userLocation[0], userLocation[1]).then(() => {
         unsubscribe = getAllDocs();
       });
@@ -106,8 +85,12 @@ const Map = ({navigation}) => {
     return () => {
       unsubscribe();
     };
-  }, [userLocation]);
+  }, [userLocation, userId]);
+
   useEffect(() => {
+    AsyncStorage.getItem('userId').then(userId => {
+      setUserId(userId);
+    });
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 60000,
@@ -118,23 +101,21 @@ const Map = ({navigation}) => {
         mapRef.current.moveTo([location.longitude, location.latitude], 1200);
         setTimeout(() => {
           mapRef.current.zoomTo(13);
-        }, 1200);
+        }, 1400);
       })
       .catch(error => {
         const {code, message} = error;
         switch (code) {
-          case 'UNAVAILABLE':
-            Alert.alert('Location is OFF', 'Kindly Enable Location');
+          case UNAVAILABLE:
+            Alert.alert(LOCATION_DISABLED[0], LOCATION_DISABLED[1]);
             break;
-          case 'UNAUTHORIZED':
-            Alert.alert(
-              'Location access denies',
-              'Kindly Grant Access to Location',
-            );
+          case UNAUTHORIZED:
+            Alert.alert(LOCATION_ACCESS_DENIED[0], LOCATION_ACCESS_DENIED[1]);
         }
       });
   }, []);
 
+  // render the users location
   const RenderMarkers = ({data}) => {
     if (!data.location) return null;
     const onPress = () => {
@@ -159,6 +140,7 @@ const Map = ({navigation}) => {
       </MarkerView>
     );
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.mapWrapper}>
