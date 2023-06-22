@@ -145,6 +145,9 @@ const Map = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.mapWrapper}>
+        {userLocation.length === 0 && (
+          <Text style={styles.noLocationText}>Location not available</Text>
+        )}
         <MapboxGL.MapView style={styles.map}>
           {[...markersData].map((data, index) => (
             <RenderMarkers data={data} key={index} />

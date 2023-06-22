@@ -12,6 +12,10 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
+  noLocationText: {
+    fontSize: 20,
+    fontWeight: 400,
+  },
   map: {
     flex: 1,
   },
