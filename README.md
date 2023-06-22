@@ -14,8 +14,3 @@ points -
 
 - updates the map in real time
 - Zoom in to see users who are very close, as only one user will be shown when zoomed out
-
-  ![login](./screenshots/login.jpeg =200x100)
-  ![home](./screenshots/home.jpeg =200x100)
-  ![map](./screenshots/map.jpeg =200x100)
-  ![messages](./screenshots/messages.jpeg =200x100)
