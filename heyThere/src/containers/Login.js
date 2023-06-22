@@ -34,7 +34,9 @@ export default function Login() {
       <View style={styles.button}>
         <TextInput
           placeholder="Enter User Name"
+          placeholderTextColor={'white'}
           value={userName}
+          style={{color: 'white'}}
           onChangeText={onChangeText}
         />
       </View>
