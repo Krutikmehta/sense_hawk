@@ -51,6 +51,7 @@ const Map = ({navigation}) => {
           }
           if (
             data &&
+            data.location &&
             data.location.length === 2 &&
             userLocation &&
             userLocation.length === 2

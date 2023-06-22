@@ -41,7 +41,7 @@ export default function Login() {
       <TouchableOpacity
         style={styles.button}
         onPress={onSubmit}
-        disabled={userName === ''}>
+        disabled={!userName || userName === ''}>
         <Text style={styles.text}>Submit</Text>
       </TouchableOpacity>
     </View>
