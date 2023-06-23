@@ -4,6 +4,8 @@
 import {initializeApp} from 'firebase/app';
 import {getDatabase} from 'firebase/database';
 import {getFirestore} from 'firebase/firestore';
+import Config from 'react-native-config';
+
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -11,14 +13,14 @@ import {getFirestore} from 'firebase/firestore';
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCnyUZkTq-_OcDNVHVSShBG84fgCDc6-Ws',
-  authDomain: 'sensehawk-84593.firebaseapp.com',
-  projectId: 'sensehawk-84593',
-  storageBucket: 'sensehawk-84593.appspot.com',
-  messagingSenderId: '536084258186',
-  appId: '1:536084258186:web:ddccbe1a8328fae604fc73',
-  databaseURL: 'https://sensehawk-84593-default-rtdb.firebaseio.com/',
-  measurementId: 'G-0W1Y3P1R80',
+  apiKey: Config.API_KEY,
+  authDomain: Config.AUTH_DOMAIN,
+  projectId: Config.PROJECT_ID,
+  storageBucket: Config.STORAGE_BUCKET,
+  messagingSenderId: Config.MESSAGING_SENDER_ID,
+  appId: Config.APP_ID,
+  databaseURL: Config.DATABASE_URL,
+  measurementId: Config.ME,
 };
 
 // Initialize Firebase
