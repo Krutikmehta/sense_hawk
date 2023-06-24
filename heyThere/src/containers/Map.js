@@ -169,7 +169,9 @@ const Map = ({navigation}) => {
           <MapboxGL.Camera ref={mapRef} />
         </MapboxGL.MapView>
         <View style={styles.toggleView}>
-          <Text style={styles.toggleText}>Toggle to see all users</Text>
+          <Text style={styles.toggleText}>
+            {range === 1 ? 'Toggle to see all users' : 'Range set to 1km'}
+          </Text>
           <Switch
             trackColor={{false: TRACK_COLOR[0], true: TRACK_COLOR[1]}}
             thumbColor={range !== 1 ? THUMB_COLOR[0] : THUMB_COLOR[1]}
