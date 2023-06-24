@@ -25,6 +25,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 400,
   },
+  toggleView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    height: '5%',
+    alignItems: 'center',
+  },
+  toggleText: {
+    color: 'white',
+    fontSize: 15,
+  },
 });
 
 export default styles;

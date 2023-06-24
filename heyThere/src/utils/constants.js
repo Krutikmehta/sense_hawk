@@ -5,3 +5,5 @@ export const LOCATION_ACCESS_DENIED = [
   'Location access denies',
   'Kindly Grant Access to Location',
 ];
+export const TRACK_COLOR = ['#767577', '#81b0ff'];
+export const THUMB_COLOR = ['#f5dd4b', '#f4f3f4'];

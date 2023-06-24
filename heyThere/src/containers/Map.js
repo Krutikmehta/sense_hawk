@@ -1,6 +1,6 @@
 //import liraries
 import React, {useEffect, useState, useRef} from 'react';
-import {View, Text, TouchableOpacity, Alert} from 'react-native';
+import {View, Text, TouchableOpacity, Alert, Switch} from 'react-native';
 import MapboxGL, {MarkerView} from '@rnmapbox/maps';
 import GetLocation from 'react-native-get-location';
 import {firestore} from '../firebase.js';
@@ -12,6 +12,8 @@ import {distance} from '../utils/utils.js';
 import {
   LOCATION_ACCESS_DENIED,
   LOCATION_DISABLED,
+  THUMB_COLOR,
+  TRACK_COLOR,
   UNAUTHORIZED,
   UNAVAILABLE,
 } from '../utils/constants.js';
@@ -24,7 +26,13 @@ const Map = ({navigation}) => {
   const [userName, setUserName] = useState(null);
   const [userLocation, setUserLocation] = useState([]);
   const [markersData, setMarkersData] = useState([]);
+  const [range, setRange] = useState(1);
   const mapRef = useRef();
+
+  const toggleRange = enabled => {
+    if (enabled) setRange(Infinity);
+    else setRange(1);
+  };
 
   // update the users location in database
   const updateUserLocation = async (longitude, latitude) => {
@@ -62,7 +70,7 @@ const Map = ({navigation}) => {
               data.location[0],
               userLocation[0],
             );
-            if (dist <= 1) {
+            if (dist <= range) {
               locations.push({...data});
             }
           }
@@ -77,6 +85,12 @@ const Map = ({navigation}) => {
   };
 
   useEffect(() => {
+    if (range === Infinity) {
+      mapRef.current.zoomTo(4);
+    }
+  }, [range]);
+
+  useEffect(() => {
     let unsubscribe = () => {};
     if (userLocation && userLocation.length === 2 && userId) {
       updateUserLocation(userLocation[0], userLocation[1]).then(() => {
@@ -86,7 +100,7 @@ const Map = ({navigation}) => {
     return () => {
       unsubscribe();
     };
-  }, [userLocation, userId]);
+  }, [userLocation, userId, range]);
 
   useEffect(() => {
     AsyncStorage.getItem('userId').then(userId => {
@@ -154,6 +168,15 @@ const Map = ({navigation}) => {
           ))}
           <MapboxGL.Camera ref={mapRef} />
         </MapboxGL.MapView>
+        <View style={styles.toggleView}>
+          <Text style={styles.toggleText}>Toggle to see all users</Text>
+          <Switch
+            trackColor={{false: TRACK_COLOR[0], true: TRACK_COLOR[1]}}
+            thumbColor={range !== 1 ? THUMB_COLOR[0] : THUMB_COLOR[1]}
+            onValueChange={toggleRange}
+            value={range !== 1}
+          />
+        </View>
       </View>
     </View>
   );
