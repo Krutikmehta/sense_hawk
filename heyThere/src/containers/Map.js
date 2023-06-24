@@ -85,16 +85,19 @@ const Map = ({navigation}) => {
   };
 
   const zoomToUserLocation = (longitude, latitude) => {
-    mapRef.current.moveTo([longitude, latitude], 1200);
+    mapRef.current?.moveTo([longitude, latitude], 1200);
     setTimeout(() => {
-      mapRef.current.zoomTo(13);
+      mapRef.current?.zoomTo(13);
     }, 1400);
   };
+
   useEffect(() => {
     if (range === Infinity) {
       mapRef.current.zoomTo(4);
     } else {
-      zoomToUserLocation(userLocation[0], userLocation[1]);
+      if (userLocation.length == 2) {
+        zoomToUserLocation(userLocation[0], userLocation[1]);
+      }
     }
   }, [range]);
 
