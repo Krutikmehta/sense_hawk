@@ -14,3 +14,9 @@ points -
 
 - updates the map in real time
 - Zoom in to see users who are very close, as only one user will be shown when zoomed out
+
+apks -
+
+- strict mode - range is set to 1km [link](https://drive.google.com/file/d/1RW4vF_RGoRji4J4OiJ0vn5qyGD0uDZ31/view?usp=drive_link)
+
+- range can be update - have a choice to see all users or users within 1km of range [link](https://drive.google.com/file/d/1--dKO3N_e_RL31Va74JeLEd_Q0izQA8z/view?usp=drive_link)
