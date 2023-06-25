@@ -63,6 +63,7 @@ const Messages = ({navigation}) => {
     const onPress = () => {
       navigation.navigate('Chat', {
         conversationId: item.conversationId,
+        userName2: item.userName,
         userId1: userId,
       });
     };

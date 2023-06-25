@@ -177,7 +177,7 @@ const Map = ({navigation}) => {
         </MapboxGL.MapView>
         <View style={styles.toggleView}>
           <Text style={styles.toggleText}>
-            {range === 1 ? 'Toggle to see all users' : 'Range set to 1km'}
+            {range === 1 ? 'Toggle to see all users' : 'Set range to 1km'}
           </Text>
           <Switch
             trackColor={{false: TRACK_COLOR[0], true: TRACK_COLOR[1]}}
