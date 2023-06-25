@@ -64,6 +64,7 @@ const Messages = ({navigation}) => {
       navigation.navigate('Chat', {
         conversationId: item.conversationId,
         userId1: userId,
+        userName2: item.userName,
       });
     };
     return (
